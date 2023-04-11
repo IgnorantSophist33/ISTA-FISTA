@@ -25,7 +25,7 @@ class FISTA():
             t1 = time.time()
             criterion_val = criterion_val + step
             run_time = t1 - t
-            timetable.append(run_time)
+            timetable.append(round(run_time, 3))
         return criterion_val
 
     def shrinkage(self, x, theta):
@@ -63,7 +63,7 @@ class FISTA():
         timetable = []
         criterion_val = 0.
         step = -0.5
-
+        nmse, L2err, L1err = 0, 0, 0
         for i in range(max_iteration):
             temp = y - torch.matmul(A, y_k)
             x_hat_new = self.shrinkage(y_k + torch.matmul(A_L, temp), Lasso_lambda / L)
@@ -84,8 +84,9 @@ class FISTA():
             # print('iter:{}, nmsedB:{}, L1:{}, L2:{}'.format(i, nmse, L1err, L2err))
 
             criterion_val = self.timer(nmse, criterion_val, step, timetable, t)
-
         print("FISTA-NMSE: ", timetable)
+        print('iter:{}, nmsedB:{}, L1:{}, L2:{}'.format(max_iteration, nmse, L1err, L2err))
+
 
         return  x_hat
 
