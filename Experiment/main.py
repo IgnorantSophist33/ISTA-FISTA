@@ -1,6 +1,6 @@
 import torch
 import numpy as np
-from Model import ISTA, FISTA, LISTA
+from Model import ISTA, FISTA, LISTA, LISTACP, TiLISTA
 """
 
 """
@@ -45,10 +45,26 @@ def main():
     """
     LISTA
     """
-    lista_layer = 20
-    lista_Lasso_lambda = 0.6
-    lista_lr = 1e-2
-    lista = LISTA.train(x_batch, y_batch, A, lista_layer, lista_Lasso_lambda, lista_lr)
+    # lista_layer = 20
+    # lista_Lasso_lambda = 0.6
+    # lista_lr = 1e-2
+    # lista = LISTA.train(x_batch, y_batch, A, lista_layer, lista_Lasso_lambda, lista_lr)
+
+    """
+    LISTA_CP
+    """
+    # listaCP_layer = 30
+    # listaCP_Lasso_lambda = 0.25
+    # listaCP_lr = 1e-3
+    # listaCP = LISTACP.train(x_batch, y_batch, A, listaCP_layer, listaCP_Lasso_lambda, listaCP_lr)
+
+    """
+    TiLISTA
+    """
+    Tilista_layer = 16
+    Tilista_Lasso_lambda = 0.25
+    Tilista_lr = 1e-3
+    Tilista = TiLISTA.train(x_batch, y_batch, A, Tilista_layer, Tilista_Lasso_lambda, Tilista_lr)
 
 
 
