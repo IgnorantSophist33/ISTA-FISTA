@@ -6,6 +6,8 @@ A = np.load(path)
 A = torch.from_numpy(A)
 A = A.float()
 
+# A = torch.load('./MatrixB.pt')
+
 probability = 0.1
 n = A.size(0)
 m = A.size(1)

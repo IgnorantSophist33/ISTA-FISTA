@@ -46,7 +46,7 @@ class ISTA():
         return  result
 
     def ista(self, A, y, x, max_iteration, err, Lasso_lambda):
-        L = self.Maxeigenvalue(A)
+        L = self.Maxeigenvalue(A)+1
         A_L = (1/L) * A.T
 
         x_hat = torch.zeros((A.shape[1], 1))
