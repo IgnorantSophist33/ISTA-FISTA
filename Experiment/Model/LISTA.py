@@ -24,12 +24,12 @@ class LISTA(nn.Module):
         self.max_iteration = max_iteration
         self.Lasso_lambda = Lasso_lambda
         self.L = self.Maxeigenvalue(A)
-        self.theta = nn.Parameter(torch.tensor([Lasso_lambda/self.L + 1e-2]).repeat(self.max_iteration))
+        self.theta = nn.Parameter(torch.tensor([Lasso_lambda/self.L]).repeat(self.max_iteration))
         # self.W_x = nn.Linear(in_features=self.m, out_features=self.m, bias=False)
         # self.W_y = nn.Linear(in_features=self.n, out_features=self.m, bias=False)
         self.W_x = nn.Parameter(torch.zeros((max_iteration, self.m, self.m)))
         self.W_y = nn.Parameter(torch.zeros((max_iteration, self.n, self.m)))
-        self.shrinkage = nn.Softshrink(1e-2)
+        # self.shrinkage = nn.Softshrink(self.theta.item())
 
     def Maxeigenvalue(self, A):
         eig, eig_vector = np.linalg.eig(torch.matmul(A.T, A))
@@ -43,11 +43,13 @@ class LISTA(nn.Module):
         print(self.W_y.shape, self.W_x.shape)
 
     def forward(self, y):
-        x_hat = self.shrinkage(torch.matmul(y, self.W_y[0]) - self.theta[0])
+        shrinkage = nn.Softshrink(torch.abs(self.theta[0]).item())
+        x_hat = shrinkage(torch.matmul(y, self.W_y[0]) - self.theta[0])
 
         # theta = self.theta * torch.ones(self.m, y.size(1))
         for i in range(self.max_iteration-1):
-            x_hat = self.shrinkage(torch.matmul(y, self.W_y[i+1]) + torch.matmul(x_hat, self.W_x[i+1]) - self.theta[i+1])
+            shrinkage = nn.Softshrink(torch.abs(self.theta[i+1]).item())
+            x_hat = shrinkage(torch.matmul(y, self.W_y[i+1]) + torch.matmul(x_hat, self.W_x[i+1]) - self.theta[i+1])
         return x_hat
 
 def NMSEdB(x, x_hat):
