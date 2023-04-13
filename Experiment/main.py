@@ -1,6 +1,6 @@
 import torch
 import numpy as np
-from Model import ISTA, FISTA, LISTA, LISTACP, TiLISTA, LISTASS
+from Model import ISTA, FISTA, LISTA, LISTACP, TiLISTA, LISTASS, LISTACPSS
 """
 
 """
@@ -71,10 +71,20 @@ def main():
     """
     listass_layer = 16
     listass_Lasso_lambda = 0.25
-    listass_lr = 1e-2
-    listass_p = int(12 * A.size(1) / 100)
+    listass_lr = 1e-3
+    listass_p = int(8 * A.size(1) / 100)
     print(listass_p)
     listass = LISTASS.train(x_batch, y_batch, A, listass_layer, listass_Lasso_lambda, listass_lr, listass_p)
+
+    """
+    LISTA_CPSS
+    """
+    # listaCPSS_layer = 16
+    # listaCPSS_Lasso_lambda = 0.25
+    # listaCPSS_lr = 1e-3
+    # listaCPSS_p = int(12 * A.size(1) / 100)
+    # print(listaCPSS_p)
+    # listaCPSS = LISTACPSS.train(x_batch, y_batch, A, listaCPSS_layer, listaCPSS_Lasso_lambda, listaCPSS_lr, listaCPSS_p)
 
 
 

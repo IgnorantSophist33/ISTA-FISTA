@@ -6,7 +6,7 @@ A = np.load(path)
 A = torch.from_numpy(A)
 A.float()
 
-batch_size = 5000
+batch_size = 129
 probability = 0.1
 n = A.size(0)
 m = A.size(1)
