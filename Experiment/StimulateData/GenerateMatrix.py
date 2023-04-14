@@ -3,8 +3,8 @@ import numpy as np
 import torch.nn.functional as F
 from scipy.linalg import orth
 
-n = 500
-m = 1000
+n = 250
+m = 500
 A = np.random.normal(0, 1/n, (n, m))
 B = torch.from_numpy(A)
 B = B.float()

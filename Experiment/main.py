@@ -1,6 +1,6 @@
 import torch
 import numpy as np
-from Model import ISTA, FISTA, LISTA, LISTACP, TiLISTA, LISTASS, LISTACPSS
+from Model import ISTA, FISTA, LISTA, LISTACP, TiLISTA, LISTASS, LISTACPSS, ALISTA
 """
 
 """
@@ -13,6 +13,8 @@ def main():
     A = A.float()
 
     # A = torch.load('./StimulateData/MatrixB.pt')
+
+    W = torch.load('./StimulateData/MatrixW.pt')
 
     n, m = A.size(0), A.size(1)
     # print(n, m)
@@ -27,11 +29,11 @@ def main():
     """
     ISTA
     """
-    # ista_max_iteration = 6000
-    # ista_Lasso_lamda = 0.125
-    # ista_err = 1e-7
-    # ista = ISTA.ISTA()
-    # ista.ista(A, y_single, x_single, ista_max_iteration, ista_err, ista_Lasso_lamda)
+    ista_max_iteration = 6000
+    ista_Lasso_lamda = 0.125
+    ista_err = 1e-7
+    ista = ISTA.ISTA()
+    ista.ista(A, y_single, x_single, ista_max_iteration, ista_err, ista_Lasso_lamda)
 
     """
     FISTA
@@ -69,12 +71,12 @@ def main():
     """
     LISTA_CP
     """
-    listass_layer = 16
-    listass_Lasso_lambda = 0.25
-    listass_lr = 1e-3
-    listass_p = int(8 * A.size(1) / 100)
-    print(listass_p)
-    listass = LISTASS.train(x_batch, y_batch, A, listass_layer, listass_Lasso_lambda, listass_lr, listass_p)
+    # listass_layer = 16
+    # listass_Lasso_lambda = 0.25
+    # listass_lr = 1e-3
+    # listass_p = int(8 * A.size(1) / 100)
+    # print(listass_p)
+    # listass = LISTASS.train(x_batch, y_batch, A, listass_layer, listass_Lasso_lambda, listass_lr, listass_p)
 
     """
     LISTA_CPSS
@@ -85,6 +87,14 @@ def main():
     # listaCPSS_p = int(12 * A.size(1) / 100)
     # print(listaCPSS_p)
     # listaCPSS = LISTACPSS.train(x_batch, y_batch, A, listaCPSS_layer, listaCPSS_Lasso_lambda, listaCPSS_lr, listaCPSS_p)
+
+    """
+    ALISTA
+    """
+    # Alista_layer = 16
+    # Alista_Lasso_lambda = 0.5
+    # Alista_lr = 1e-2
+    # Alista = ALISTA.train(x_batch, y_batch, A, Alista_layer, Alista_Lasso_lambda, Alista_lr, W)
 
 
 
