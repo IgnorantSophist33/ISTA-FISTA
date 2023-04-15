@@ -2,6 +2,7 @@ import torch
 import  numpy as np
 from visdom import Visdom
 import time
+import torch.nn as nn
 
 """
 A : measurement matrix
@@ -26,12 +27,12 @@ class ISTA():
             timetable.append(round(run_time, 3))
         return criterion_val
 
-    def shrinkage(self, x, theta):
-        temp = torch.cat([torch.abs(x) - theta, torch.zeros(x.size(0), 1)], dim=1)
-        max_val, max_idx = torch.max(temp, 1)
-        max_val = max_val.unsqueeze(1)
-        max_nd = max_val.numpy()
-        return np.multiply(np.sign(x), max_nd)
+    # def shrinkage(self, x, theta):
+    #     temp = torch.cat([torch.abs(x) - theta, torch.zeros(x.size(0), 1)], dim=1)
+    #     max_val, max_idx = torch.max(temp, 1)
+    #     max_val = max_val.unsqueeze(1)
+    #     max_nd = max_val.numpy()
+    #     return np.multiply(np.sign(x), max_nd)
 
     def Maxeigenvalue(self, A):
         eig, eig_vector = np.linalg.eig(torch.matmul(A.T, A))
@@ -46,7 +47,7 @@ class ISTA():
         return  result
 
     def ista(self, A, y, x, max_iteration, err, Lasso_lambda):
-        L = self.Maxeigenvalue(A)+1
+        L = self.Maxeigenvalue(A)
         A_L = (1/L) * A.T
 
         x_hat = torch.zeros((A.shape[1], 1))
@@ -60,9 +61,10 @@ class ISTA():
         criterion_val = 0.
         step = -0.5
         nmse, L2err, L1err = 0, 0, 0
+        shrinkage = nn.Softshrink(Lasso_lambda / L)
         for i in range(max_iteration):
             temp = y - torch.matmul(A, x_hat)
-            x_hat_new = self.shrinkage(x_hat + torch.matmul(A_L, temp), Lasso_lambda / L)
+            x_hat_new = shrinkage(x_hat + torch.matmul(A_L, temp))
             if torch.abs(x_hat_new - x_hat).sum() <= err:
                 print("already converged")
                 break
