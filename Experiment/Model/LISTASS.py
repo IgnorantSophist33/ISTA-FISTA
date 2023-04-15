@@ -86,26 +86,27 @@ class LISTASS(nn.Module):
         return x_hat
 
 def NMSEdB(x, x_hat):
-    x = x.unsqueeze(1)
-    x_hat = x_hat.unsqueeze(1)
+    # x = x.unsqueeze(1)
+    # x_hat = x_hat.unsqueeze(1)
     vec_temp1 = x - x_hat
     vec_temp2 = x
-    norm1 = torch.pow(torch.norm(vec_temp1, p=2), 2)
-    norm2 = torch.pow(torch.norm(vec_temp2, p=2), 2)
-    result = 10 * torch.log10(norm1 / norm2)
+    norm1 = torch.pow(torch.norm(vec_temp1, p=2, dim=1), 2)
+    norm2 = torch.pow(torch.norm(vec_temp2, p=2, dim=1), 2)
+    # print(norm2.shape)
+    result = torch.sum(10 * torch.log10(norm1 / norm2))/x.size(0)
     return result
 
 def train(x, y, A, max_iteration, Lasso_lambda, lr, pmax):
         viz = Visdom()
-        n_samples = y.size(0) - 1
         batch_size = 32
+        n_samples = y.size(0) - batch_size
+
         steps = n_samples // batch_size
 
-
-        x_test = x[x.size(0) - 1, :]
-        y_test = y[y.size(0) - 1, :]
-        x_comp = x[0, :]
-        y_comp = y[0, :]
+        x_test = x[x.size(0) - batch_size:x.size(0), :]
+        y_test = y[x.size(0) - batch_size:x.size(0), :]
+        x_comp = x[0:batch_size, :]
+        y_comp = y[0:batch_size, :]
 
         listass = LISTASS(A, max_iteration, Lasso_lambda, pmax)
         listass.weights_initialise()

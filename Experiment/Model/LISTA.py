@@ -44,34 +44,36 @@ class LISTA(nn.Module):
 
     def forward(self, y):
         shrinkage = nn.Softshrink(torch.abs(self.theta[0]).item())
-        x_hat = shrinkage(torch.matmul(y, self.W_y[0]) - self.theta[0])
+        x_hat = shrinkage(torch.matmul(y, self.W_y[0]))
 
         # theta = self.theta * torch.ones(self.m, y.size(1))
         for i in range(self.max_iteration-1):
             shrinkage = nn.Softshrink(torch.abs(self.theta[i+1]).item())
-            x_hat = shrinkage(torch.matmul(y, self.W_y[i+1]) + torch.matmul(x_hat, self.W_x[i+1]) - self.theta[i+1])
+            x_hat = shrinkage(torch.matmul(y, self.W_y[i+1]) + torch.matmul(x_hat, self.W_x[i+1]))
         return x_hat
 
 def NMSEdB(x, x_hat):
-    x = x.unsqueeze(1)
-    x_hat = x_hat.unsqueeze(1)
+    # x = x.unsqueeze(1)
+    # x_hat = x_hat.unsqueeze(1)
     vec_temp1 = x - x_hat
     vec_temp2 = x
-    norm1 = torch.pow(torch.norm(vec_temp1, p=2), 2)
-    norm2 = torch.pow(torch.norm(vec_temp2, p=2), 2)
-    result = 10 * torch.log10(norm1 / norm2)
+    norm1 = torch.pow(torch.norm(vec_temp1, p=2, dim=1), 2)
+    norm2 = torch.pow(torch.norm(vec_temp2, p=2, dim=1), 2)
+    # print(norm2.shape)
+    result = torch.sum(10 * torch.log10(norm1 / norm2))/x.size(0)
     return result
 
 def train(x, y, A, max_iteration, Lasso_lambda, lr):
         viz = Visdom()
-        n_samples = y.size(0) - 1
-        batch_size = 128
+        batch_size = 32
+        n_samples = y.size(0) - batch_size
+
         steps = n_samples // batch_size
 
-        x_test = x[x.size(0) - 1, :]
-        y_test = y[y.size(0) - 1, :]
-        x_comp = x[0, :]
-        y_comp = y[0, :]
+        x_test = x[x.size(0) - batch_size:x.size(0), :]
+        y_test = y[x.size(0) - batch_size:x.size(0), :]
+        x_comp = x[0:batch_size, :]
+        y_comp = y[0:batch_size, :]
 
         lista = LISTA(A, max_iteration, Lasso_lambda)
         lista.weights_initialise()
@@ -110,6 +112,7 @@ def train(x, y, A, max_iteration, Lasso_lambda, lr):
 
                 x_test_hat = lista(y_test)
                 x_comp_hat = lista(y_comp)
+                # print(x_test_hat.shape)
                 nmse1 = NMSEdB(x_test, x_test_hat)
                 nmse2 = NMSEdB(x_comp, x_comp_hat)
                 viz.line(Y=np.column_stack((nmse1.item(), nmse2.item())), X=np.column_stack((i, i)), win='NMSE',
